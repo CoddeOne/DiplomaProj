@@ -114,6 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={() => setSelectedSection(section)}
             sx={{
               flex: 1,
+              cursor:"pointer",
               ...(selectedSection === section && {
                 backgroundColor: (theme) => (theme.palette.mode === 'light' ? '#e0e0e0' : '#616161'),
               }),

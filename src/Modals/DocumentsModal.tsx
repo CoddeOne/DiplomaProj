@@ -1,21 +1,34 @@
 import React from 'react';
 import { Modal, Box, Typography, List, ListItem, ListItemText, IconButton, TextField, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { FormData } from 'types';
+
+interface DocumentItem {
+  id: string;
+  name: string;
+  data: FormData;
+}
 
 interface DocumentsModalProps {
-  documents: any[];
-  onSelectDoc: (doc: any) => void;
+  documents: DocumentItem[];
+  onSelectDoc: (doc: DocumentItem) => void;
   onCreateNew: (protocolNumber: string) => void;
   onDeleteDoc: (docId: string) => void;
   onClose: () => void;
 }
 
-const DocumentsModal: React.FC<DocumentsModalProps> = ({ documents, onSelectDoc, onCreateNew, onDeleteDoc, onClose }) => {
+const DocumentsModal: React.FC<DocumentsModalProps> = ({
+  documents,
+  onSelectDoc,
+  onCreateNew,
+  onDeleteDoc,
+  onClose,
+}) => {
   const [newProtocolNumber, setNewProtocolNumber] = React.useState('');
 
   const handleCreate = () => {
     if (newProtocolNumber.trim()) {
-      onCreateNew(newProtocolNumber);
+      onCreateNew(newProtocolNumber); // Передаємо номер у handleCreateNewDoc
       setNewProtocolNumber('');
     }
   };
@@ -24,7 +37,7 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({ documents, onSelectDoc,
     <Modal
       open={true}
       onClose={onClose}
-      disableEscapeKeyDown={!documents.length} 
+      disableEscapeKeyDown={!documents.length}
       BackdropProps={{
         onClick: (e) => {
           if (!documents.length) {
@@ -62,7 +75,7 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({ documents, onSelectDoc,
               }
             >
               <ListItemText
-                primary={doc.name}
+                primary={doc.name} // Тут відображається "Протокол № 31"
                 onClick={() => onSelectDoc(doc)}
                 sx={{ cursor: 'pointer' }}
               />

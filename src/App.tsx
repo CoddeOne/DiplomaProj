@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import { Sidebar } from './components/Sidebar';
 import { generateDocx } from './components/DocumentGenerator';
 import Header from './components/Header';
@@ -14,10 +15,14 @@ import { renderSection } from './utils/renderSection';
 
 const App = () => {
   const { mode, theme, handleThemeToggle } = useTheme();
+  const [selectedSection, setSelectedSection] = useState('Шапка');
+  const [highlightErrors, setHighlightErrors] = useState(false);
+
   const {
     documents,
     formData,
     setFormData,
+    currentDoc,
     isModalOpen,
     setIsModalOpen,
     saveDocument,
@@ -31,9 +36,12 @@ const App = () => {
     alertMessage,
     setAlertMessage,
     validateFormData,
-  } = useDocuments();
-  const [selectedSection, setSelectedSection] = useState('Шапка');
-  const [highlightErrors, setHighlightErrors] = useState(false);
+  } = useDocuments({ setSelectedSection }); // Передаємо setSelectedSection
+
+  useEffect(() => {
+    console.log('App: formData changed:', formData);
+    console.log('App: selectedSection changed:', selectedSection);
+  }, [formData, selectedSection]);
 
   const addQuestion = () => {
     const updatedFormData = { ...formData };
@@ -82,7 +90,14 @@ const App = () => {
               Згенерувати DOCX
             </Button>
           </Box>
-          {renderSection(selectedSection, formData, setFormData, setSelectedSection)}
+          {selectedSection !== 'Питання' && selectedSection !== 'Рішення' && (
+            <Typography variant="h6">
+              Поточна вкладка: {selectedSection}
+            </Typography>
+          )}
+          <div key={`${currentDoc?.id}-${selectedSection}`}>
+            {renderSection(selectedSection, formData, setFormData, setSelectedSection)}
+          </div>
         </Box>
       </Box>
       {isModalOpen && (

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import initialFormData from '../utils/initialFormData';
+import { FormData } from 'types';
 
-// Тип для документа
 interface DocumentItem {
   id: string;
   name: string;
-  data: typeof initialFormData;
+  data: FormData;
 }
 
+interface UseDocumentsProps {
+  setSelectedSection: (section: string) => void; 
+}
 
 const getFromStorage = (key: string, defaultValue: any) => {
   const value = localStorage.getItem(key);
@@ -20,10 +23,10 @@ const setToStorage = (key: string, value: any) => {
 
 const removeFromStorage = (key: string) => localStorage.removeItem(key);
 
-export const useDocuments = () => {
+export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
   const [documents, setDocuments] = useState<DocumentItem[]>(getFromStorage('documents', []));
   const [currentDoc, setCurrentDoc] = useState<DocumentItem | null>(getFromStorage('currentDoc', null));
-  const [formData, setFormData] = useState<typeof initialFormData>(
+  const [formData, setFormData] = useState<FormData>(
     getFromStorage('currentFormData', currentDoc?.data ?? initialFormData)
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(
@@ -55,7 +58,7 @@ export const useDocuments = () => {
       ? { ...currentDoc, data: formData }
       : {
           id: Date.now().toString(),
-          name: `Протокол ${formData.protocolNumber || 'Без номера'}`,
+          name: `Протокол № ${formData.protocolNumber || 'Без номера'}`,
           data: formData,
         };
     setDocuments((docs) =>
@@ -68,16 +71,35 @@ export const useDocuments = () => {
   };
 
   const handleCreateNewDoc = (protocolNumber: string) => {
-    updateCurrentDoc();
-    setCurrentDoc(null);
-    setFormData({ ...initialFormData, protocolNumber });
+    if (currentDoc) {
+      updateCurrentDoc();
+    }
+
+    const newFormData: FormData = JSON.parse(JSON.stringify(initialFormData));
+    newFormData.protocolNumber = protocolNumber;
+
+    const newDoc: DocumentItem = {
+      id: Date.now().toString(),
+      name: `Протокол № ${protocolNumber || 'Без номера'}`,
+      data: newFormData,
+    };
+
+    console.log('useDocuments: Creating new doc with formData:', newFormData);
+    setFormData(newFormData);
+    setCurrentDoc(newDoc);
+    setDocuments((docs) => [...docs, newDoc]);
+    setSelectedSection('Шапка'); 
     setIsModalOpen(false);
+    removeFromStorage('currentFormData');
   };
 
   const handleSelectDoc = (doc: DocumentItem) => {
-    updateCurrentDoc();
+    if (currentDoc) {
+      updateCurrentDoc();
+    }
     setCurrentDoc(doc);
     setFormData(doc.data);
+    setSelectedSection('Шапка'); 
     setIsModalOpen(false);
   };
 
@@ -86,6 +108,7 @@ export const useDocuments = () => {
     if (currentDoc?.id === docId) {
       setCurrentDoc(null);
       setFormData(initialFormData);
+      setSelectedSection('Шапка');
       removeFromStorage('currentFormData');
     }
   };
@@ -124,7 +147,7 @@ export const useDocuments = () => {
 
     ['attendees', 'agenda', 'questions', 'decisions'].forEach((arrayKey, index) => {
       const sectionNames = ['Присутні', 'Порядок денний', 'Питання', 'Рішення'];
-      (formData[arrayKey as keyof typeof initialFormData] as any[]).forEach((item, i) => {
+      (formData[arrayKey as keyof FormData] as any[]).forEach((item, i) => {
         const isEmpty = Object.values(item).some(
           (val) => !val || (typeof val === 'string' && val.trim() === '')
         );

@@ -3,21 +3,17 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Typography } from '@mui/material';
 
-// Тип для вкладених об’єктів (head, secretary)
 interface Person {
   position: string;
   name: string;
 }
 
-// Тип для formData (лише потрібна частина)
 interface FormData {
   protocolNumber: string;
   head: Person;
   secretary: Person;
-  // Якщо formData має більше полів, додайте їх тут
 }
 
-// Пропси компонента
 interface HeaderFormProps {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
@@ -45,9 +41,6 @@ export const HeaderForm: React.FC<HeaderFormProps> = ({ formData, setFormData })
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Шапка протоколу
-      </Typography>
       <TextField
         label="Номер протоколу"
         value={formData.protocolNumber}
