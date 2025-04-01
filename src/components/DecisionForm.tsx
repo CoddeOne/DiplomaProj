@@ -9,25 +9,18 @@ interface DecisionFormProps {
 }
 
 export const DecisionForm: React.FC<DecisionFormProps> = ({ index, formData, setFormData }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const updatedFormData = { ...formData };
-    updatedFormData.decisions[index][field] = e.target.value;
+    updatedFormData.questions[index].decision = e.target.value; 
     setFormData(updatedFormData);
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <TextField
-        label="Заголовок"
-        value={formData.decisions[index]?.title || ''}
-        onChange={(e) => handleInputChange(e, 'title')}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Текст рішення"
-        value={formData.decisions[index]?.text || ''}
-        onChange={(e) => handleInputChange(e, 'text')}
+        label="Рішення"
+        value={formData.questions[index]?.decision || ''}
+        onChange={handleInputChange}
         fullWidth
         multiline
         rows={3}

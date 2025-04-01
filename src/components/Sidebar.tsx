@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -6,29 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-// Типи для вкладених об’єктів у formData
-interface Question {
-  speaker: string;
-  considered: string;
-}
-
-interface Decision {
-  title: string;
-  text: string;
-}
-
-interface AgendaItem {
-  text: string;
-  speaker: string;
-}
-
-interface FormData {
-  questions: Question[];
-  decisions: Decision[];
-  agenda: AgendaItem[];
-}
-
+import { FormData } from '../types/types';
 interface SidebarProps {
   selectedSection: string;
   setSelectedSection: (section: string) => void;
@@ -49,32 +28,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   highlightErrors,
 }) => {
   const sections = [
-    'Шапка',
+    'Головна',
     'Присутні',
     'Порядок денний',
     'Питання',
     ...formData.questions.map((_, index) => `Питання ${index + 1}`),
-    'Рішення',
-    ...formData.decisions.map((_, index) => `Рішення ${index + 1}`),
-    'Футер',
+    'Реквізити виконавця',
   ];
 
   const errors = validateFormData();
 
   const hasError = (section: string): boolean => !!errors[section];
 
-  const isSubItem = (section: string): boolean =>
-    section.startsWith('Питання ') || section.startsWith('Рішення ');
-
+  const isSubItem = (section: string): boolean => section.startsWith('Питання ') 
   const handleDeleteQuestion = (index: number) => {
     const updatedQuestions = formData.questions.filter((_, i) => i !== index);
-    const updatedDecisions = formData.decisions.filter((_, i) => i !== index);
     const updatedAgenda = formData.agenda.filter((_, i) => i !== index);
 
     setFormData({
       ...formData,
       questions: updatedQuestions,
-      decisions: updatedDecisions,
       agenda: updatedAgenda,
     });
 

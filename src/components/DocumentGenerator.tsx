@@ -1,239 +1,295 @@
-import { Document, Packer, Paragraph, TextRun, AlignmentType } from 'docx';
+// @ts-nocheck
+import { Document, Packer, Paragraph, TextRun, TabStopType, TabStopPosition } from 'docx';
 import { saveAs } from 'file-saver';
+import { FormData } from '../types/types';
 
-export const generateDocx = (formData: any) => {
+const getMonthName = (month: string) => {
+  const months = [
+    'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
+    'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня',
+  ];
+  return months[parseInt(month) - 1] || '';
+};
+
+export const generateDocx = (formData: FormData) => {
   const doc = new Document({
-    styles: {
-      default: {
-        document: {
-          run: {
-            font: 'Times New Roman',
-            size: 24, // 12pt
-          },
-          paragraph: {
-            spacing: {
-              line: 240, // Міжрядковий інтервал 1.0 (12pt * 1.0 * 20)
-              after: 120, // Відступ після абзацу 6pt
-            },
-          },
-        },
-        heading1: {
-          run: {
-            bold: true,
-            size: 28, // 14pt для "ПРОТОКОЛ №4"
-          },
-          paragraph: {
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 240, line: 240 }, // Міжрядковий інтервал 1.0
-          },
-        },
-        heading2: {
-          run: {
-            bold: true,
-            size: 24, // 12pt для "ПОРЯДОК ДЕННИЙ", "ПИТАННЯ", "РІШЕННЯ"
-          },
-          paragraph: {
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 240, line: 240 }, // Міжрядковий інтервал 1.0
-          },
-        },
-        attendees: {
-          paragraph: {
-            spacing: { after: 60, line: 240 }, // Міжрядковий інтервал 1.0 для списку присутніх
-          },
-        },
-      },
-    },
     sections: [
       {
-        properties: {
-          page: {
-            margin: {
-              top: 1134, // 2 см
-              bottom: 1134, // 2 см
-              left: 1501, // 3 см
-              right: 1134, // 2 см
-            },
-          },
-        },
+        properties: {},
         children: [
           // Заголовок
           new Paragraph({
-            style: 'heading1',
-            children: [new TextRun({ text:`ПРОТОКОЛ №${formData.protocolNumber}`, bold: true })],
-            spacing: { line: 220, after: 0 },
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({}),
-          new Paragraph({
             children: [
               new TextRun({
-                text: 'кафедри інформаційних технологій та систем електронних комунікацій',
+                text: `Протокол № ${formData.protocolNumber}`,
+                font: 'Times New Roman',
+                size: 28, // 14pt
                 bold: true,
               }),
             ],
-            spacing: { line: 220, after: 0 },
-            alignment: AlignmentType.CENTER,
+            alignment: 'center',
           }),
           new Paragraph({
             children: [
-              new TextRun({ text: 'Навчально-наукового інституту цивільного захисту', bold: true }),
+              new TextRun({
+                text: 'засідання кафедри інформаційних технологій та систем електронних комунікацій',
+                font: 'Times New Roman',
+                size: 28,
+              }),
             ],
-            spacing: { line: 220, after: 0 },
-            alignment: AlignmentType.CENTER,
+            alignment: 'center',
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'Навчально-наукового інституту цивільного захисту',
+                font: 'Times New Roman',
+                size: 28,
+              }),
+            ],
+            alignment: 'center',
           }),
           new Paragraph({
             children: [
               new TextRun({
                 text: 'Львівського державного університету безпеки життєдіяльності',
-                bold: true,
+                font: 'Times New Roman',
+                size: 28,
               }),
             ],
-            alignment: AlignmentType.CENTER,
+            alignment: 'center',
           }),
           new Paragraph({
-            children: [new TextRun({ text: `${formData.date} року` })],
-            alignment: AlignmentType.LEFT,
-          }),
-
-          // Голова
-          new Paragraph({
-            children: [new TextRun({ text: 'Голова: ', bold: true })],
-            spacing: { line: 200, after: 0 },
+            text: '',
           }),
           new Paragraph({
             children: [
-              new TextRun({ text: formData.head.position, bold: true }),
-              new TextRun({ text: `\t\t\t\t\t${formData.head.name}` }),
+              new TextRun({
+                
+                text: `«${formData.date.split('.')[0]}» ${getMonthName(formData.date.split('.')[1])} ${formData.date.split('.')[2]} року`,
+                font: 'Times New Roman',
+                size: 28,
+              }),
             ],
-            spacing: { line: 200, after: 0 },
+            alignment: 'left',
+          }),
+          new Paragraph({
+            text: '',
           }),
 
-          // Секретар
+          // Голова і Секретар (верхня частина)
           new Paragraph({
-            children: [new TextRun({ text: 'Секретар: ', bold: true })],
-            spacing: { line: 240, after: 0 },
+            tabStops: [
+              {
+                type: TabStopType.RIGHT,
+                position: TabStopPosition.MAX,
+              },
+            ],
+            children: [
+              new TextRun({
+                text: 'Голова:',
+                font: 'Times New Roman',
+                size: 28,
+              }),
+              new TextRun({
+                text: `\t${formData.head.name}`,
+                font: 'Times New Roman',
+                size: 28,
+              }),
+            ],
           }),
           new Paragraph({
-            children: [
-              new TextRun({ text: formData.secretary.position, bold: true }),
-              new TextRun({ text: `\t\t\t\t\t\t${formData.secretary.name}` }),
+            tabStops: [
+              {
+                type: TabStopType.RIGHT,
+                position: TabStopPosition.MAX,
+              },
             ],
-            spacing: { line: 240, after: 0 },
+            children: [
+              new TextRun({
+                text: 'Секретар:',
+                font: 'Times New Roman',
+                size: 28,
+              }),
+              new TextRun({
+                text: `\t${formData.secretary.name}`,
+                font: 'Times New Roman',
+                size: 28,
+              }),
+            ],
+          }),
+          new Paragraph({
+            text: '',
           }),
 
           // Присутні
           new Paragraph({
-            children: [new TextRun({ text: 'Присутні:', bold: true })],
-            spacing: { line: 240, after: 0 },
+            children: [
+              new TextRun({
+                text: 'Присутні:',
+                font: 'Times New Roman',
+                size: 28,
+                bold: true,
+              }),
+            ],
           }),
-          ...formData.attendees.map((attendee: any) => {
-            const [surname, firstName] = attendee.name.split(' ');
-            const formattedName = `${surname.toUpperCase()} ${firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()}`;
-            return new Paragraph({
-              style: 'attendees',
-              children: [
-                new TextRun({ text: attendee.position }),
-                new TextRun({ text: `\t\t\t\t\t\t\t${formattedName}` }),
+          ...formData.attendees.map((attendee) => 
+            new Paragraph({
+              tabStops: [
+                {
+                  type: TabStopType.RIGHT,
+                  position: TabStopPosition.MAX,
+                },
               ],
-              spacing: { after: 0, line: 220 },
-            });
+              children: [
+                new TextRun({
+                  text: `\t${attendee.name}`,
+                  font: 'Times New Roman',
+                  size: 28,
+                }),
+              ],
+            })
+          ),
+          new Paragraph({
+            text: '',
           }),
 
           // Порядок денний
-          new Paragraph({}),
-          new Paragraph({}),
-          new Paragraph({
-            style: 'heading2',
-            children: [new TextRun({ text: 'ПОРЯДОК ДЕННИЙ:' })],
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({}),
-          new Paragraph({}),
-          ...formData.agenda.map((item: any, index: number) => [
-            new Paragraph({
-              text: `${index + 1}. \t ${item.text}`,
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({ text: 'Доповідач: ', bold: true }),
-                new TextRun({ text: item.speaker, bold: true }),
-              ],
-              alignment: AlignmentType.RIGHT,
-            }),
-          ]).flat(),
-
-          // Питання
-          ...formData.questions.map((question: any, index: number) => [
-            new Paragraph({}),
-            new Paragraph({
-              style: 'heading2',
-              children: [new TextRun({ text: `ПИТАННЯ ${index + 1}`, bold: true })],
-              alignment: AlignmentType.CENTER,
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: 'З доповіддю виступив:' })],
-            }),
-            new Paragraph({
-              text: `\t${question.speaker}`,
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: 'Розглянуто:' })],
-            }),
-            new Paragraph({
-              text: `\t${question.considered}`,
-            }),
-          ]).flat(),
-
-          // Рішення
-          new Paragraph({}),
-          new Paragraph({
-            style: 'heading2',
-            children: [new TextRun({ text: 'РІШЕННЯ:' })],
-            alignment: AlignmentType.CENTER,
-          }),
-          ...formData.decisions.map((decision: any) => [
-            new Paragraph({
-              children: [
-                new TextRun({ text: `\t${decision.title}`, bold: true }),
-              ],
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 120 },
-            }),
-            new Paragraph({}),
-            new Paragraph({
-              children: [new TextRun({ text: '\tРішення:', bold: true })],
-            }),
-            new Paragraph({
-              text: `\t${decision.text}`,
-            }),
-          ]).flat(),
-
-          // Футер
-          new Paragraph({}),
-          new Paragraph({}),
-          new Paragraph({
-            text: 'Протокол вела:',
-            spacing: { after: 0, line: 240 },
-          }),
           new Paragraph({
             children: [
-              new TextRun({ text: formData.protocolLedBy.position }),
-              new TextRun({ text: `\t\t\t\t\t${formData.protocolLedBy.name}`, bold: true }),
+              new TextRun({
+                text: 'Порядок денний:',
+                font: 'Times New Roman',
+                size: 28,
+                bold: true,
+              }),
             ],
-            spacing: { after: 0, line: 240 },
           }),
-          new Paragraph({}),
+          ...formData.agenda.map((item, index) => 
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${index + 1}. ${item.text} (доповідач – гарант освітньої програми ${item.speaker})`,
+                  font: 'Times New Roman',
+                  size: 28,
+                }),
+              ],
+              indent: {
+                firstLine: 567,
+              },
+              spacing: {
+                after: 200,
+              },
+            })
+          ),
           new Paragraph({
-            text: 'Заступник начальник кафедри',
-            spacing: { after: 0, line: 240 },
+            text: '',
           }),
+
+          // СЛУХАЛИ
           new Paragraph({
             children: [
-              new TextRun({ text: formData.deputyHead.position }),
-              new TextRun({ text: `\t\t\t\t${formData.deputyHead.name}`, bold: true }),
+              new TextRun({
+                text: '1. СЛУХАЛИ:',
+                font: 'Times New Roman',
+                size: 28,
+                bold: true,
+              }),
             ],
-            spacing: { after: 0, line: 240 },
+          }),
+          ...formData.questions.map((question, index) => 
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `1.${index + 1}. ${extractSpeaker(question.speaker)}. У своїй доповіді він/вона проінформував(ла) ${question.considered}`,
+                  font: 'Times New Roman',
+                  size: 28,
+                }),
+              ],
+              indent: {
+                firstLine: 567,
+              },
+              spacing: {
+                after: 200,
+              },
+            })
+          ),
+          new Paragraph({
+            text: '',
+          }),
+
+          // ВИРІШИЛИ
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'ВИРІШИЛИ:',
+                font: 'Times New Roman',
+                size: 28,
+                bold: true,
+              }),
+            ],
+          }),
+          ...formData.questions.map((question, index) => 
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${index + 1}. ${question.decision}`,
+                  font: 'Times New Roman',
+                  size: 28,
+                }),
+              ],
+              indent: {
+                firstLine: 567,
+              },
+              spacing: {
+                after: 200,
+              },
+            })
+          ),
+          new Paragraph({
+            text: '',
+          }),
+
+          // Підписи
+          new Paragraph({
+            tabStops: [
+              {
+                type: TabStopType.RIGHT,
+                position: TabStopPosition.MAX,
+              },
+            ],
+            children: [
+              new TextRun({
+                text: 'Голова',
+                font: 'Times New Roman',
+                size: 28,
+              }),
+              new TextRun({
+                text: `\tпідпис ${formData.protocolLedBy.name}`,
+                font: 'Times New Roman',
+                size: 28,
+              }),
+            ],
+          }),
+          new Paragraph({
+            tabStops: [
+              {
+                type: TabStopType.RIGHT,
+                position: TabStopPosition.MAX,
+              },
+            ],
+            children: [
+              new TextRun({
+                text: 'Секретар',
+                font: 'Times New Roman',
+                size: 28,
+              }),
+              new TextRun({
+                text: `\tпідпис ${formData.deputyHead.name}`,
+                font: 'Times New Roman',
+                size: 28,
+              }),
+            ],
           }),
         ],
       },
@@ -241,6 +297,11 @@ export const generateDocx = (formData: any) => {
   });
 
   Packer.toBlob(doc).then((blob) => {
-    saveAs(blob, formData.protocolNumber);
+    saveAs(blob, `Протокол № ${formData.protocolNumber}.docx`);
   });
+};
+
+const extractSpeaker = (speaker: string) => {
+  const match = speaker.match(/([А-ЯІЇЄҐ][а-яіїєґ]+ [А-ЯІЇЄҐ][а-яіїєґ]+)/);
+  return match ? match[0] : speaker;
 };

@@ -1,18 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-
-
-interface Person {
-  position: string;
-  name: string;
-}
-
-interface FormData {
-  protocolLedBy: Person;
-  deputyHead: Person;
-}
-
+import { FormData } from '../types/types';
 
 interface FooterFormProps {
   formData: FormData;
@@ -20,45 +9,28 @@ interface FooterFormProps {
 }
 
 export const FooterForm: React.FC<FooterFormProps> = ({ formData, setFormData }) => {
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    section: 'protocolLedBy' | 'deputyHead',
-    field: keyof Person
+  const handlePersonChange = (personField: 'protocolLedBy' | 'deputyHead', subField: 'name') => (
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const updatedFormData = { 
-      ...formData, 
-      [section]: { ...formData[section], [field]: e.target.value }
-    };
-    setFormData(updatedFormData);
+    setFormData({
+      ...formData,
+      [personField]: { ...formData[personField], [subField]: e.target.value },
+    });
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <TextField
-        label="Посада (Протокол вела)"
-        value={formData.protocolLedBy.position}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, 'protocolLedBy', 'position')}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="ПІБ (Протокол вела)"
+        label="Ім’я секретаря"
         value={formData.protocolLedBy.name}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, 'protocolLedBy', 'name')}
+        onChange={handlePersonChange('protocolLedBy', 'name')}
         fullWidth
         margin="normal"
       />
       <TextField
-        label="Посада (Заступник)"
-        value={formData.deputyHead.position}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, 'deputyHead', 'position')}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="ПІБ (Заступник)"
+        label="Ім’я голови"
         value={formData.deputyHead.name}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, 'deputyHead', 'name')}
+        onChange={handlePersonChange('deputyHead', 'name')}
         fullWidth
         margin="normal"
       />

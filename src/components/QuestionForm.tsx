@@ -1,6 +1,8 @@
+// src/components/QuestionForm.tsx
 import React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import { DecisionForm } from './DecisionForm';
 
 interface QuestionFormProps {
   index: number;
@@ -35,6 +37,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ index, formData, set
         rows={3}
         margin="normal"
       />
+      <DecisionForm index={index} formData={formData} setFormData={setFormData} />
     </Box>
   );
 };

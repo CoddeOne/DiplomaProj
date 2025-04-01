@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import initialFormData from '../utils/initialFormData';
-import { FormData } from 'types';
+import { FormData } from '../types/types';
 
 interface DocumentItem {
   id: string;
@@ -9,7 +9,7 @@ interface DocumentItem {
 }
 
 interface UseDocumentsProps {
-  setSelectedSection: (section: string) => void; 
+  setSelectedSection: (section: string) => void;
 }
 
 const getFromStorage = (key: string, defaultValue: any) => {
@@ -45,7 +45,7 @@ export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [formData]);
-
+  
   const updateCurrentDoc = () => {
     if (!currentDoc) return;
     const updatedDoc: DocumentItem = { ...currentDoc, data: formData };
@@ -88,7 +88,7 @@ export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
     setFormData(newFormData);
     setCurrentDoc(newDoc);
     setDocuments((docs) => [...docs, newDoc]);
-    setSelectedSection('Шапка'); 
+    setSelectedSection('Головна');
     setIsModalOpen(false);
     removeFromStorage('currentFormData');
   };
@@ -99,7 +99,7 @@ export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
     }
     setCurrentDoc(doc);
     setFormData(doc.data);
-    setSelectedSection('Шапка'); 
+    setSelectedSection('Головна');
     setIsModalOpen(false);
   };
 
@@ -108,7 +108,7 @@ export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
     if (currentDoc?.id === docId) {
       setCurrentDoc(null);
       setFormData(initialFormData);
-      setSelectedSection('Шапка');
+      setSelectedSection('Головна');
       removeFromStorage('currentFormData');
     }
   };
@@ -119,19 +119,15 @@ export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
   const validateFormData = (): Record<string, string[]> => {
     const errors: Record<string, string[]> = {};
     const requiredFields: Record<string, { key: string; label: string }[]> = {
-      'Шапка': [
+      'Головна': [
         { key: 'protocolNumber', label: 'Номер протоколу' },
-        { key: 'head.position', label: 'Посада голови' },
         { key: 'head.name', label: 'Ім’я голови' },
-        { key: 'secretary.position', label: 'Посада секретаря' },
         { key: 'secretary.name', label: 'Ім’я секретаря' },
-      ],
-      'Футер': [
-        { key: 'protocolLedBy.position', label: 'Посада ведучого' },
-        { key: 'protocolLedBy.name', label: 'Ім’я ведучого' },
-        { key: 'deputyHead.position', label: 'Посада заступника' },
-        { key: 'deputyHead.name', label: 'Ім’я заступника' },
         { key: 'date', label: 'Дата' },
+      ],
+      'Реквізити виконавця': [
+        { key: 'protocolLedBy.name', label: 'Ім’я ведучого' },
+        { key: 'deputyHead.name', label: 'Ім’я заступника' },
       ],
     };
 
@@ -145,18 +141,28 @@ export const useDocuments = ({ setSelectedSection }: UseDocumentsProps) => {
       });
     });
 
-    ['attendees', 'agenda', 'questions', 'decisions'].forEach((arrayKey, index) => {
-      const sectionNames = ['Присутні', 'Порядок денний', 'Питання', 'Рішення'];
+
+    ['attendees', 'agenda', 'questions'].forEach((arrayKey, index) => {
+      const sectionNames = ['Присутні', 'Порядок денний', 'Питання'];
       (formData[arrayKey as keyof FormData] as any[]).forEach((item, i) => {
-        const isEmpty = Object.values(item).some(
-          (val) => !val || (typeof val === 'string' && val.trim() === '')
-        );
-        if (isEmpty) {
-          const section =
-            arrayKey === 'questions' || arrayKey === 'decisions'
-              ? `${sectionNames[index]} ${i + 1}`
-              : sectionNames[index];
-          errors[section] = [...(errors[section] || []), arrayKey === 'decisions' ? 'Поле рішення' : 'Поле'];
+        if (arrayKey === 'questions') {
+          const isEmpty = !item.speaker?.trim() || !item.considered?.trim() || !item.decision?.trim();
+          if (isEmpty) {
+            errors[`${sectionNames[index]} ${i + 1}`] = [
+              ...(errors[`${sectionNames[index]} ${i + 1}`] || []),
+              !item.speaker?.trim() ? 'Доповідач' : '',
+              !item.considered?.trim() ? 'Розглянуто' : '',
+              !item.decision?.trim() ? 'Рішення' : '',
+            ].filter(Boolean);
+          }
+        } else {
+          const isEmpty = Object.values(item).some(
+            (val) => !val || (typeof val === 'string' && val.trim() === '')
+          );
+          if (isEmpty) {
+            const section = arrayKey === 'agenda' ? `${sectionNames[index]} ${i + 1}` : sectionNames[index];
+            errors[section] = [...(errors[section] || []), 'Поле'];
+          }
         }
       });
     });

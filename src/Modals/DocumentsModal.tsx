@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Box, Typography, List, ListItem, ListItemText, IconButton, TextField, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FormData } from 'types';
+import { FormData } from '../types/types';
 
 interface DocumentItem {
   id: string;

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+ // @ts-nocheck
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,7 +16,7 @@ import { renderSection } from './utils/renderSection';
 
 const App = () => {
   const { mode, theme, handleThemeToggle } = useTheme();
-  const [selectedSection, setSelectedSection] = useState('Шапка');
+  const [selectedSection, setSelectedSection] = useState('Головна');
   const [highlightErrors, setHighlightErrors] = useState(false);
 
   const {
@@ -36,12 +37,7 @@ const App = () => {
     alertMessage,
     setAlertMessage,
     validateFormData,
-  } = useDocuments({ setSelectedSection }); // Передаємо setSelectedSection
-
-  useEffect(() => {
-    console.log('App: formData changed:', formData);
-    console.log('App: selectedSection changed:', selectedSection);
-  }, [formData, selectedSection]);
+  } = useDocuments({ setSelectedSection });
 
   const addQuestion = () => {
     const updatedFormData = { ...formData };
@@ -90,12 +86,13 @@ const App = () => {
               Згенерувати DOCX
             </Button>
           </Box>
-          {selectedSection !== 'Питання' && selectedSection !== 'Рішення' && (
+          {selectedSection !== 'Питання' && (
             <Typography variant="h6">
               Поточна вкладка: {selectedSection}
             </Typography>
           )}
           <div key={`${currentDoc?.id}-${selectedSection}`}>
+            {console.log(selectedSection)}
             {renderSection(selectedSection, formData, setFormData, setSelectedSection)}
           </div>
         </Box>

@@ -18,7 +18,7 @@ const Header = ({ mode, setMode, onOpenModal }: HeaderProps) => {
         </Box>
       </Box>
       <Button variant="outlined" onClick={onOpenModal}>
-        Змінити документ
+        Вибрати документ
       </Button>
     </Box>
   );
