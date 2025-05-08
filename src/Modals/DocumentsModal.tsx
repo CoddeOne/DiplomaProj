@@ -28,7 +28,7 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({
 
   const handleCreate = () => {
     if (newProtocolNumber.trim()) {
-      onCreateNew(newProtocolNumber); // Передаємо номер у handleCreateNewDoc
+      onCreateNew(newProtocolNumber);
       setNewProtocolNumber('');
     }
   };
@@ -75,7 +75,7 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({
               }
             >
               <ListItemText
-                primary={doc.name} // Тут відображається "Протокол № 31"
+                primary={doc.name}
                 onClick={() => onSelectDoc(doc)}
                 sx={{ cursor: 'pointer' }}
               />

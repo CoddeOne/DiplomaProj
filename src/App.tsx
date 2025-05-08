@@ -40,13 +40,26 @@ const App = () => {
   } = useDocuments({ setSelectedSection });
 
   const addQuestion = () => {
-    const updatedFormData = { ...formData };
-    updatedFormData.questions.push({ speaker: '', considered: '' });
-    updatedFormData.decisions.push({ title: '', text: '' });
-    updatedFormData.agenda.push({ text: '', speaker: '' });
+    const newId = Date.now().toString();
+    const newQuestionIndex = formData.questions.length + 1;
+    const updatedFormData = {
+      ...formData,
+      questions: [
+        ...formData.questions,
+        {
+          id: newId,
+          speaker: '',
+          considered: '',
+          agendaItem: '',
+          decision: ''
+        }
+      ],
+      agenda: [...formData.agenda, { id: newId, text: '', speaker: '' }]
+    };
     setFormData(updatedFormData);
-    setSelectedSection(`Питання ${updatedFormData.questions.length}`);
+    setSelectedSection(`Питання ${newQuestionIndex}`);
   };
+
 
   const handleGenerateDocx = () => {
     const errors = validateFormData();
@@ -92,7 +105,6 @@ const App = () => {
             </Typography>
           )}
           <div key={`${currentDoc?.id}-${selectedSection}`}>
-            {console.log(selectedSection)}
             {renderSection(selectedSection, formData, setFormData, setSelectedSection)}
           </div>
         </Box>

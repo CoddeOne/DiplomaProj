@@ -169,7 +169,7 @@ export const generateDocx = (formData: FormData) => {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `${index + 1}. ${item.text} (доповідач – гарант освітньої програми ${item.speaker})`,
+                  text: `${index + 1}. ${item.text} (доповідач –  ${item.speaker})`,
                   font: 'Times New Roman',
                   size: 28,
                 }),
@@ -265,7 +265,7 @@ export const generateDocx = (formData: FormData) => {
                 size: 28,
               }),
               new TextRun({
-                text: `\tпідпис ${formData.protocolLedBy.name}`,
+                text: `\t${formData.deputyHead.name}`,
                 font: 'Times New Roman',
                 size: 28,
               }),
@@ -285,7 +285,7 @@ export const generateDocx = (formData: FormData) => {
                 size: 28,
               }),
               new TextRun({
-                text: `\tпідпис ${formData.deputyHead.name}`,
+                text: `\t${formData.protocolLedBy.name}`,
                 font: 'Times New Roman',
                 size: 28,
               }),
